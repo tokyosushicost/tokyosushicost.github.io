@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sushi Restoran Maliyet Hesaplama Sistemi">
+    <title>SushiCost - Maliyet Hesaplama</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo"><span class="logo-icon">🍣</span>
+                <div class="logo-text">
+                    <h1>SushiCost</h1><span class="logo-sub">Maliyet Sistemi</span>
+                </div>
+            </div>
+        </div>
+        <nav class="nav-menu">
+            <button class="nav-item active" data-page="dashboard" id="nav-dashboard"><span
+                    class="nav-icon">📊</span><span>Özet Panel</span></button>
+            <button class="nav-item" data-page="ingredients" id="nav-ingredients"><span
+                    class="nav-icon">🥑</span><span>Malzemeler</span></button>
+            <button class="nav-item" data-page="categories" id="nav-categories"><span
+                    class="nav-icon">📁</span><span>Kategoriler</span></button>
+            <button class="nav-item" data-page="products" id="nav-products"><span
+                    class="nav-icon">🍱</span><span>Ürünler</span></button>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="btn-action" id="btn-export"><span>📤</span> Dışa Aktar</button>
+            <button class="btn-action" id="btn-import"><span>📥</span> İçe Aktar</button>
+            <input type="file" id="import-file" accept=".json" style="display:none">
+        </div>
+    </aside>
+    <header class="mobile-header" id="mobile-header">
+        <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+        <div class="mobile-logo">🍣 SushiCost</div>
+    </header>
+    <main class="main-content" id="main-content">
+        <!-- DASHBOARD -->
+        <section class="page active" id="page-dashboard">
+            <div class="page-header">
+                <h2>Özet Panel</h2>
+                <p class="page-desc">Maliyet özetinizi görüntüleyin</p>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card g1">
+                    <div class="stat-icon">🥑</div>
+                    <div class="stat-info"><span class="stat-value" id="stat-ingredients">0</span><span
+                            class="stat-label">Malzeme</span></div>
+                </div>
+                <div class="stat-card g2">
+                    <div class="stat-icon">📁</div>
+                    <div class="stat-info"><span class="stat-value" id="stat-categories">0</span><span
+                            class="stat-label">Kategori</span></div>
+                </div>
+                <div class="stat-card g3">
+                    <div class="stat-icon">🍱</div>
+                    <div class="stat-info"><span class="stat-value" id="stat-products">0</span><span
+                            class="stat-label">Ürün</span></div>
+                </div>
+                <div class="stat-card g4">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-info"><span class="stat-value" id="stat-avg">₺0</span><span class="stat-label">Ort.
+                            Maliyet</span></div>
+                </div>
+            </div>
+            <div class="dash-section">
+                <h3>Ürün Maliyetleri</h3>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Ürün</th>
+                                <th>Kategori</th>
+                                <th>Malzeme</th>
+                                <th>Maliyet</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dash-products-body">
+                            <tr class="empty-row">
+                                <td colspan="4">Henüz ürün eklenmedi.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="dash-section">
+                <h3>En Pahalı Malzemeler</h3>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Malzeme</th>
+                                <th>Birim</th>
+                                <th>Fiyat (kg/lt/adet)</th>
+                                <th>Fiyat (gr/ml)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dash-ing-body">
+                            <tr class="empty-row">
+                                <td colspan="4">Henüz malzeme eklenmedi.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        <!-- INGREDIENTS -->
+        <section class="page" id="page-ingredients">
+            <div class="page-header">
+                <h2>Malzeme Yönetimi</h2>
+                <p class="page-desc">Malzemeleri ve birim fiyatlarını yönetin</p>
+            </div>
+            <div class="form-card">
+                <h3 class="form-title"><span id="ing-ft-icon">➕</span> <span id="ing-ft-text">Yeni Malzeme Ekle</span>
+                </h3>
+                <form id="ing-form" class="form-grid"><input type="hidden" id="ing-edit-id">
+                    <div class="form-group"><label for="ing-name">Malzeme Adı</label><input type="text" id="ing-name"
+                            placeholder="Örn: Somon Balığı" required></div>
+                    <div class="form-group"><label for="ing-unit">Birim</label><select id="ing-unit">
+                            <option value="kg">Kilogram (kg)</option>
+                            <option value="lt">Litre (lt)</option>
+                            <option value="adet">Adet</option>
+                        </select></div>
+                    <div class="form-group"><label for="ing-price" id="ing-price-label">Fiyat (₺/kg)</label><input
+                            type="number" id="ing-price" placeholder="0.00" step="0.01" min="0" required></div>
+                    <div class="form-actions"><button type="submit" class="btn btn-primary" id="ing-submit">💾
+                            Kaydet</button><button type="button" class="btn btn-secondary" id="ing-cancel"
+                            style="display:none">✖ İptal</button></div>
+                </form>
+            </div>
+            <div class="search-bar"><span class="search-icon">🔍</span><input type="text" id="ing-search"
+                    placeholder="Malzeme ara..."></div>
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Malzeme</th>
+                            <th>Birim</th>
+                            <th>Fiyat (kg/lt/adet)</th>
+                            <th>Fiyat (gr/ml)</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ing-body">
+                        <tr class="empty-row">
+                            <td colspan="5">Henüz malzeme eklenmedi.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <!-- CATEGORIES -->
+        <section class="page" id="page-categories">
+            <div class="page-header">
+                <h2>Kategori Yönetimi</h2>
+                <p class="page-desc">Ürün kategorilerini düzenleyin</p>
+            </div>
+            <div class="form-card">
+                <h3 class="form-title"><span id="cat-ft-icon">➕</span> <span id="cat-ft-text">Yeni Kategori Ekle</span>
+                </h3>
+                <form id="cat-form" class="form-grid form-grid-sm"><input type="hidden" id="cat-edit-id">
+                    <div class="form-group"><label for="cat-name">Kategori Adı</label><input type="text" id="cat-name"
+                            placeholder="Örn: Nigiri, Maki" required></div>
+                    <div class="form-group"><label for="cat-emoji">Emoji</label><input type="text" id="cat-emoji"
+                            placeholder="🍣" maxlength="2"></div>
+                    <div class="form-actions"><button type="submit" class="btn btn-primary" id="cat-submit">💾
+                            Kaydet</button><button type="button" class="btn btn-secondary" id="cat-cancel"
+                            style="display:none">✖ İptal</button></div>
+                </form>
+            </div>
+            <div class="categories-grid" id="cat-grid">
+                <div class="empty-state"><span class="empty-icon">📁</span>
+                    <p>Henüz kategori eklenmedi.</p>
+                </div>
+            </div>
+        </section>
+        <!-- PRODUCTS -->
+        <section class="page" id="page-products">
+            <div class="page-header">
+                <h2>Ürün Yönetimi</h2>
+                <p class="page-desc">Ürün oluşturun, malzeme ekleyin, maliyeti otomatik hesaplayın</p>
+            </div>
+            <div class="form-card">
+                <h3 class="form-title"><span id="prod-ft-icon">➕</span> <span id="prod-ft-text">Yeni Ürün Oluştur</span>
+                </h3>
+                <form id="prod-form"><input type="hidden" id="prod-edit-id">
+                    <div class="form-grid">
+                        <div class="form-group"><label for="prod-name">Ürün Adı</label><input type="text" id="prod-name"
+                                placeholder="Örn: Somon Nigiri" required></div>
+                        <div class="form-group"><label for="prod-cat">Kategori</label><select id="prod-cat" required>
+                                <option value="">Seçin</option>
+                            </select></div>
+                        <div class="form-group"><label for="prod-sell-price">Satış Fiyatı (₺)</label><input type="number" id="prod-sell-price"
+                                placeholder="0.00" step="0.01" min="0"></div>
+                    </div>
+                    <div class="prod-ing-section">
+                        <h4 class="section-sub">İçindekiler</h4>
+                        <div class="ing-add-row">
+                            <div class="form-group"><label>Malzeme</label><select id="prod-ing-sel">
+                                    <option value="">Seçin</option>
+                                </select></div>
+                            <div class="form-group"><label>Miktar</label><input type="number" id="prod-ing-amt"
+                                    placeholder="0" step="0.1" min="0"></div>
+                            <div class="form-group"><label>Birim</label><select id="prod-ing-unit">
+                                    <option value="gr">gr</option>
+                                    <option value="kg">kg</option>
+                                    <option value="ml">ml</option>
+                                    <option value="lt">lt</option>
+                                    <option value="adet">adet</option>
+                                </select></div>
+                            <button type="button" class="btn btn-add-ing" id="btn-add-prod-ing">➕ Ekle</button>
+                        </div>
+                        <div class="prod-ing-list" id="prod-ing-list">
+                            <div class="empty-ing">Henüz malzeme eklenmedi</div>
+                        </div>
+                        <div class="cost-summary" id="cost-summary">
+                            <div class="cost-row"><span>Toplam Maliyet:</span><span class="cost-value" id="prod-total-cost">₺0.00</span></div>
+                            <div class="cost-row"><span>Satış Fiyatı:</span><span class="cost-value sell-price" id="prod-sell-display">₺0.00</span></div>
+                            <div class="cost-row"><span>Kâr:</span><span class="cost-value profit-value" id="prod-profit">₺0.00</span></div>
+                            <div class="cost-row"><span>Kâr Marjı:</span><span class="cost-value profit-value" id="prod-margin">%0</span></div>
+                        </div>
+                    </div>
+                    <div class="form-actions"><button type="submit" class="btn btn-primary" id="prod-submit">💾 Ürünü
+                            Kaydet</button><button type="button" class="btn btn-secondary" id="prod-cancel"
+                            style="display:none">✖ İptal</button></div>
+                </form>
+            </div>
+            <div class="filter-bar">
+                <div class="search-bar"><span class="search-icon">🔍</span><input type="text" id="prod-search"
+                        placeholder="Ürün ara..."></div><select id="prod-filter-cat" class="filter-select">
+                    <option value="">Tüm Kategoriler</option>
+                </select>
+            </div>
+            <div class="products-grid" id="prod-grid">
+                <div class="empty-state"><span class="empty-icon">🍱</span>
+                    <p>Henüz ürün eklenmedi.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    <div class="toast-container" id="toast-container"></div>
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Onay</h3><button class="modal-close" id="modal-close">✕</button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-msg">Silmek istediğinize emin misiniz?</p>
+            </div>
+            <div class="modal-footer"><button class="btn btn-secondary" id="modal-cancel-btn">İptal</button><button
+                    class="btn btn-danger" id="modal-confirm-btn">Sil</button></div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+
+</html>

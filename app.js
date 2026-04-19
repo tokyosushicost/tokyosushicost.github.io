@@ -1,5 +1,5 @@
 // ===== SushiCost - Maliyet Hesaplama Sistemi =====
-// Tüm veriler data.json dosyasına kaydedilir (localStorage kullanılmaz)
+// Tüm veriler localStorage'a kaydedilir, ilk açılışta data.json'dan yüklenir
 
 (function() {
 'use strict';
@@ -23,25 +23,29 @@ async function init() {
     renderAll();
 }
 
-// ===== STORAGE (JSON dosyasına okuma/yazma) =====
+// ===== STORAGE (localStorage + data.json fallback) =====
 async function loadData() {
     try {
-        const resp = await fetch('/api/data');
+        // Önce localStorage'dan oku
+        const stored = localStorage.getItem('sushicost_data');
+        if (stored) {
+            data = JSON.parse(stored);
+            return;
+        }
+        // İlk açılışta data.json'dan yükle
+        const resp = await fetch('data.json');
         if (resp.ok) {
             data = await resp.json();
+            localStorage.setItem('sushicost_data', JSON.stringify(data));
         }
     } catch(e) {
         console.error('Veri yükleme hatası:', e);
     }
 }
 
-async function saveData() {
+function saveData() {
     try {
-        await fetch('/api/data', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
+        localStorage.setItem('sushicost_data', JSON.stringify(data));
     } catch(e) {
         console.error('Veri kaydetme hatası:', e);
         showToast('Veri kaydedilemedi!', 'error');
